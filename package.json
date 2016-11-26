@@ -21,7 +21,7 @@
     "url": "https://github.com/carlosazaustre/react-firebase-chat/issues"
   },
   "homepage": "https://github.com/carlosazaustre/react-firebase-chat#readme",
-  "dependencies": {
+  "devDependencies": {
     "babel-loader": "^6.2.8",
     "babel-preset-latest": "^6.16.0",
     "babel-preset-react": "^6.16.0",
@@ -31,5 +31,9 @@
     "style-loader": "^0.13.1",
     "webpack": "^1.13.3",
     "webpack-dev-server": "^1.16.2"
+  },
+  "dependencies": {
+    "react": "^15.4.1",
+    "react-dom": "^15.4.1"
   }
 }
