@@ -5,7 +5,7 @@
   "main": "public/index.js",
   "scripts": {
     "build": "webpack --colors",
-    "serve": "webpack-dev-server --content-base public/ --colors",
+    "serve": "webpack-dev-server --content-base public/ --colors --progress",
     "deploy": "webpack -p",
     "start": "npm run build && npm run serve"
   },
@@ -25,6 +25,8 @@
   },
   "homepage": "https://github.com/carlosazaustre/react-firebase-chat#readme",
   "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-core": "^6.18.2",
     "babel-loader": "^6.2.8",
     "babel-preset-latest": "^6.16.0",
     "babel-preset-react": "^6.16.0",
@@ -37,6 +39,8 @@
   },
   "dependencies": {
     "react": "^15.4.1",
-    "react-dom": "^15.4.1"
+    "react-dom": "^15.4.1",
+    "webpack": "^1.13.3",
+    "webpack-dev-server": "^1.16.2"
   }
 }
