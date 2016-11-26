@@ -1,17 +1,49 @@
 import React from 'react'
 
-function Header ({ appName }) {
+function Header ({ appName, user, onAuth, onLogout }) {
+  function renderUserData () {
+    return (
+      <ul className='right'>
+        <li>
+          <img
+            width='32'
+            className='circle responsive-img'
+            src={user.photoURL}
+          />
+        </li>
+        <li>{user.displayName}</li>
+        <li>
+          <button
+            className='waves-effect waves-light btn blue darken-1'
+            onClick={onLogout}
+          >
+            Logout
+          </button>
+        </li>
+      </ul>
+    )
+  }
+
+  function renderLoginButton () {
+    return (
+      <ul className='right'>
+        <li>
+          <button
+            className='waves-effect waves-light btn blue darken-1'
+            onClick={onAuth}
+          >
+            Login
+          </button>
+        </li>
+      </ul>
+    )
+  }
+
   return (
     <nav className='blue darken-4'>
       <div className='nav-wrapper container'>
         <a href='#' className='left brand-logo'>{appName}</a>
-        <ul className='right'>
-          <li>
-            <button className='waves-effect waves-light btn blue darken-1'>
-              Login
-            </button>
-          </li>
-        </ul>
+        {user ? renderUserData() : renderLoginButton()}
       </div>
     </nav>
   )

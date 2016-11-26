@@ -8,7 +8,8 @@ class App extends Component {
   constructor () {
     super()
     this.state = {
-      messages: []
+      messages: [],
+      user: null
     }
   }
 
@@ -20,6 +21,30 @@ class App extends Component {
         messages: this.state.messages.concat(snap.val())
       })
     })
+
+    firebase.auth().onAuthStateChanged(user => {
+      console.log(user)
+      if (user) {
+        this.setState({ user })
+      } else {
+        this.setState({ user: null })
+      }
+    })
+  }
+
+  handleAuth () {
+    const provider = new firebase.auth.GoogleAuthProvider()
+    provider.addScope('https://www.googleapis.com/auth/plus.login')
+
+    firebase.auth().signInWithPopup(provider)
+      .then(result => console.log(`${result.user.email} ha iniciado sesión`))
+      .catch(error => console.log(`Error ${error.code}: ${error.message}`))
+  }
+
+  handleLogout () {
+    firebase.auth().signOut()
+      .then(result => console.log('Te has desconectado correctamente'))
+      .catch(error => console.log(`Error ${error.code}: ${error.message}`))
   }
 
   handleSendMessage (event) {
@@ -34,13 +59,20 @@ class App extends Component {
   render () {
     return (
       <div>
-        <Header appName='Chat Real' />
+        <Header
+          appName='Chat Real'
+          user={this.state.user}
+          onAuth={this.handleAuth.bind(this)}
+          onLogout={this.handleLogout.bind(this)}
+        />
         <main role='main' className='container'>
           {this.state.messages.map(msg => (
             <li>{msg.text}</li>
           ))}
         </main>
-        <MessageInput onSendMessage={ this.handleSendMessage.bind(this) } />
+        <MessageInput
+          onSendMessage={this.handleSendMessage.bind(this)}
+        />
       </div>
     )
   }
