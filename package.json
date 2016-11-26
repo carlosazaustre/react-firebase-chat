@@ -20,5 +20,16 @@
   "bugs": {
     "url": "https://github.com/carlosazaustre/react-firebase-chat/issues"
   },
-  "homepage": "https://github.com/carlosazaustre/react-firebase-chat#readme"
+  "homepage": "https://github.com/carlosazaustre/react-firebase-chat#readme",
+  "dependencies": {
+    "babel-loader": "^6.2.8",
+    "babel-preset-latest": "^6.16.0",
+    "babel-preset-react": "^6.16.0",
+    "css-loader": "^0.26.0",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "html-webpack-plugin": "^2.24.1",
+    "style-loader": "^0.13.1",
+    "webpack": "^1.13.3",
+    "webpack-dev-server": "^1.16.2"
+  }
 }
