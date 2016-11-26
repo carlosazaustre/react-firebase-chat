@@ -2,7 +2,8 @@ import React, { Component } from 'react'
 import firebase from 'firebase'
 
 import Header from './Header'
-import MessageInput from './MessageInput'
+import ChatInput from './ChatInput'
+import ChatMessage from './ChatMessage'
 
 class App extends Component {
   constructor () {
@@ -52,7 +53,12 @@ class App extends Component {
     const database = firebase.database().ref().child('messages')
 
     let message = database.push()
-    let msg = { text: event.target.text.value }
+    let msg = {
+      text: event.target.text.value,
+      avatar: this.state.user.photoURL,
+      displayName: this.state.user.displayName,
+      date: Date.now()
+    }
     message.set(msg)
   }
 
@@ -67,10 +73,10 @@ class App extends Component {
         />
         <main role='main' className='container'>
           {this.state.messages.map(msg => (
-            <li>{msg.text}</li>
-          ))}
+            <ChatMessage message={msg} />
+          )).reverse()}
         </main>
-        <MessageInput
+        <ChatInput
           onSendMessage={this.handleSendMessage.bind(this)}
         />
       </div>
