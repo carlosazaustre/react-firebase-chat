@@ -62,6 +62,12 @@ class App extends Component {
     message.set(msg)
   }
 
+  renderMessages () {
+    setTimeout(() => {
+      console.log('caca')
+    }, 2000)
+  }
+
   render () {
     return (
       <div>
@@ -71,11 +77,17 @@ class App extends Component {
           onAuth={this.handleAuth.bind(this)}
           onLogout={this.handleLogout.bind(this)}
         />
-        <main role='main' className='container'>
+        <div className='message-chat-list container'>
+          <span>
+            Bienvenid@ al chat de los Reyes Magos. Antes de que
+            puedas enviarnos tu carta, te haremos unas preguntas
+            para ver que tal te has portado...
+          </span>
+          <br/><br/>
           {this.state.messages.map(msg => (
             <ChatMessage message={msg} />
           )).reverse()}
-        </main>
+        </div>
         <ChatInput
           onSendMessage={this.handleSendMessage.bind(this)}
         />

@@ -3,11 +3,11 @@ import React from 'react'
 function Header ({ appName, user, onAuth, onLogout }) {
   function renderUserData () {
     return (
-      <ul className='right'>
+      <ul className='navbar right'>
         <li>
           <img
             width='32'
-            className='circle responsive-img'
+            className='avatar circle responsive-img'
             src={user.photoURL}
           />
         </li>

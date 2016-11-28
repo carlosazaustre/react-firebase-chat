@@ -63,7 +63,9 @@
 
 	var _firebase2 = _interopRequireDefault(_firebase);
 
-	var _App = __webpack_require__(185);
+	__webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./styles.css\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+
+	var _App = __webpack_require__(186);
 
 	var _App2 = _interopRequireDefault(_App);
 
@@ -22130,7 +22132,8 @@
 
 
 /***/ },
-/* 185 */
+/* 185 */,
+/* 186 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22149,13 +22152,17 @@
 
 	var _firebase2 = _interopRequireDefault(_firebase);
 
-	var _Header = __webpack_require__(186);
+	var _Header = __webpack_require__(187);
 
 	var _Header2 = _interopRequireDefault(_Header);
 
-	var _MessageInput = __webpack_require__(187);
+	var _ChatInput = __webpack_require__(188);
 
-	var _MessageInput2 = _interopRequireDefault(_MessageInput);
+	var _ChatInput2 = _interopRequireDefault(_ChatInput);
+
+	var _ChatMessage = __webpack_require__(189);
+
+	var _ChatMessage2 = _interopRequireDefault(_ChatMessage);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -22174,7 +22181,8 @@
 	    var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this));
 
 	    _this.state = {
-	      messages: []
+	      messages: [],
+	      user: null
 	    };
 	    return _this;
 	  }
@@ -22191,11 +22199,51 @@
 	          messages: _this2.state.messages.concat(snap.val())
 	        });
 	      });
+
+	      _firebase2.default.auth().onAuthStateChanged(function (user) {
+	        console.log(user);
+	        if (user) {
+	          _this2.setState({ user: user });
+	        } else {
+	          _this2.setState({ user: null });
+	        }
+	      });
+	    }
+	  }, {
+	    key: 'handleAuth',
+	    value: function handleAuth() {
+	      var provider = new _firebase2.default.auth.GoogleAuthProvider();
+	      provider.addScope('https://www.googleapis.com/auth/plus.login');
+
+	      _firebase2.default.auth().signInWithPopup(provider).then(function (result) {
+	        return console.log(result.user.email + ' ha iniciado sesi\xF3n');
+	      }).catch(function (error) {
+	        return console.log('Error ' + error.code + ': ' + error.message);
+	      });
+	    }
+	  }, {
+	    key: 'handleLogout',
+	    value: function handleLogout() {
+	      _firebase2.default.auth().signOut().then(function (result) {
+	        return console.log('Te has desconectado correctamente');
+	      }).catch(function (error) {
+	        return console.log('Error ' + error.code + ': ' + error.message);
+	      });
 	    }
 	  }, {
 	    key: 'handleSendMessage',
 	    value: function handleSendMessage(event) {
 	      event.preventDefault();
+	      var database = _firebase2.default.database().ref().child('messages');
+
+	      var message = database.push();
+	      var msg = {
+	        text: event.target.text.value,
+	        avatar: this.state.user.photoURL,
+	        displayName: this.state.user.displayName,
+	        date: Date.now()
+	      };
+	      message.set(msg);
 	    }
 	  }, {
 	    key: 'render',
@@ -22203,19 +22251,22 @@
 	      return _react2.default.createElement(
 	        'div',
 	        null,
-	        _react2.default.createElement(_Header2.default, { appName: 'Chat Real' }),
+	        _react2.default.createElement(_Header2.default, {
+	          appName: 'Chat Real',
+	          user: this.state.user,
+	          onAuth: this.handleAuth.bind(this),
+	          onLogout: this.handleLogout.bind(this)
+	        }),
 	        _react2.default.createElement(
 	          'main',
 	          { role: 'main', className: 'container' },
 	          this.state.messages.map(function (msg) {
-	            return _react2.default.createElement(
-	              'li',
-	              null,
-	              msg.text
-	            );
-	          }),
-	          _react2.default.createElement(_MessageInput2.default, { onSendMessage: this.handleSendMessage.bind(this) })
-	        )
+	            return _react2.default.createElement(_ChatMessage2.default, { message: msg });
+	          }).reverse()
+	        ),
+	        _react2.default.createElement(_ChatInput2.default, {
+	          onSendMessage: this.handleSendMessage.bind(this)
+	        })
 	      );
 	    }
 	  }]);
@@ -22226,7 +22277,7 @@
 	exports.default = App;
 
 /***/ },
-/* 186 */
+/* 187 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22242,7 +22293,62 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function Header(_ref) {
-	  var appName = _ref.appName;
+	  var appName = _ref.appName,
+	      user = _ref.user,
+	      onAuth = _ref.onAuth,
+	      onLogout = _ref.onLogout;
+
+	  function renderUserData() {
+	    return _react2.default.createElement(
+	      'ul',
+	      { className: 'right' },
+	      _react2.default.createElement(
+	        'li',
+	        null,
+	        _react2.default.createElement('img', {
+	          width: '32',
+	          className: 'circle responsive-img',
+	          src: user.photoURL
+	        })
+	      ),
+	      _react2.default.createElement(
+	        'li',
+	        null,
+	        user.displayName
+	      ),
+	      _react2.default.createElement(
+	        'li',
+	        null,
+	        _react2.default.createElement(
+	          'button',
+	          {
+	            className: 'waves-effect waves-light btn blue darken-1',
+	            onClick: onLogout
+	          },
+	          'Logout'
+	        )
+	      )
+	    );
+	  }
+
+	  function renderLoginButton() {
+	    return _react2.default.createElement(
+	      'ul',
+	      { className: 'right' },
+	      _react2.default.createElement(
+	        'li',
+	        null,
+	        _react2.default.createElement(
+	          'button',
+	          {
+	            className: 'waves-effect waves-light btn blue darken-1',
+	            onClick: onAuth
+	          },
+	          'Login'
+	        )
+	      )
+	    );
+	  }
 
 	  return _react2.default.createElement(
 	    'nav',
@@ -22255,24 +22361,7 @@
 	        { href: '#', className: 'left brand-logo' },
 	        appName
 	      ),
-	      _react2.default.createElement(
-	        'ul',
-	        { className: 'right' },
-	        _react2.default.createElement(
-	          'li',
-	          null,
-	          _react2.default.createElement(
-	            'button',
-	            { className: 'waves-effect waves-light btn blue darken-1' },
-	            'Login',
-	            _react2.default.createElement(
-	              'i',
-	              { className: 'material-icons left' },
-	              'input'
-	            )
-	          )
-	        )
-	      )
+	      user ? renderUserData() : renderLoginButton()
 	    )
 	  );
 	}
@@ -22280,7 +22369,7 @@
 	exports.default = Header;
 
 /***/ },
-/* 187 */
+/* 188 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22300,22 +22389,85 @@
 
 	  return _react2.default.createElement(
 	    'form',
-	    { onSubmit: onSendMessage },
-	    _react2.default.createElement('input', { type: 'text', placeholder: 'Escribe tu mensaje...' }),
+	    { className: 'page-footer blue lighten-4', onSubmit: onSendMessage },
+	    _react2.default.createElement('br', null),
 	    _react2.default.createElement(
-	      'button',
-	      { className: 'btn waves-effect waves-light blue darken-1', type: 'submit' },
-	      'Enviar',
+	      'div',
+	      { className: 'container row' },
 	      _react2.default.createElement(
-	        'i',
-	        { className: 'material-icons right' },
-	        'send'
+	        'div',
+	        { className: 'col s9' },
+	        _react2.default.createElement('input', { name: 'text', type: 'text' })
+	      ),
+	      _react2.default.createElement(
+	        'div',
+	        { className: 'col s3' },
+	        _react2.default.createElement(
+	          'button',
+	          { className: 'btn waves-effect waves-light blue darken-1', type: 'submit' },
+	          'Enviar',
+	          _react2.default.createElement(
+	            'i',
+	            { className: 'material-icons right' },
+	            'send'
+	          )
+	        )
 	      )
 	    )
 	  );
 	}
 
 	exports.default = MessageInput;
+
+/***/ },
+/* 189 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function ChatMessage(_ref) {
+	  var message = _ref.message;
+
+	  return _react2.default.createElement(
+	    'div',
+	    { className: 'card-panel grey lighten-5' },
+	    _react2.default.createElement(
+	      'div',
+	      { className: 'row valign-wrapper' },
+	      _react2.default.createElement(
+	        'div',
+	        { className: 'col s2' },
+	        _react2.default.createElement('img', {
+	          width: '64px',
+	          src: message.avatar,
+	          alt: message.displayName,
+	          className: 'circle responsive-img'
+	        })
+	      ),
+	      _react2.default.createElement(
+	        'div',
+	        { className: 'col s10' },
+	        _react2.default.createElement(
+	          'span',
+	          { className: 'black-text' },
+	          message.text
+	        )
+	      )
+	    )
+	  );
+	}
+
+	exports.default = ChatMessage;
 
 /***/ }
 /******/ ]);
