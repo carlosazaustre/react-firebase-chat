@@ -19,16 +19,17 @@ class App extends Component {
   }
 
   componentWillMount () {
-    const database = firebase.database().ref().child('messages')
+    const messagesDB = firebase.database().ref().child('messages')
 
-    database.on('child_added', snap => {
+    messagesDB.remove()
+
+    messagesDB.on('child_added', snap => {
       this.setState({
         messages: this.state.messages.concat(snap.val())
       })
     })
 
     firebase.auth().onAuthStateChanged(user => {
-      console.log(user)
       if (user) {
         this.setState({ user })
       } else {
@@ -53,9 +54,9 @@ class App extends Component {
   }
 
   handleSendMessage (text) {
+    // Gestionamos el mensaje que envía el usuario
     const messagesDB = firebase.database().ref().child('messages')
 
-    // Gestionamos el mensaje que envía el usuario
     let newUserMessage = messagesDB.push()
     let msg = {
       text,
@@ -66,30 +67,22 @@ class App extends Component {
     newUserMessage.set(msg)
 
     // El bot responde...
+    console.log('Antes del if ' + this.state.count)
     if (this.state.count < 1) {
       // Si es el primer mensaje
-      this.setState({ count: 2 })
-
-      firebase.database().ref('/bot/bienvenida').once('value')
-        .then(snap => {
-          let newBotMessage = messagesDB.push()
-          newBotMessage.set({
-            text: snap.val(),
-            avatar: BOT_AVATAR,
-            displayName: BOT_NAME,
-            date: Date.now()
-          })
-        })
+      this.setState({ count: this.state.count + 1 })
+      console.log('Depues del if ' + this.state.count)
+      this._handleBotMessage('bienvenida')
     } else {
       // Si es el siguiente y contiene alguna palabra "mágica"
       msg.text = msg.text.toLowerCase()
 
-      if (msg.text.includes('react')) this._handleBotMessage(messagesDB, 'react')
-      else if (msg.text.includes('android')) this._handleBotMessage(messagesDB, 'android')
-      else if (msg.text.includes('angular')) this._handleBotMessage(messagesDB, 'angular')
-      else if (msg.text.includes('javascript')) this._handleBotMessage(messagesDB, 'javascript')
-      else if (msg.text.includes('polymer')) this._handleBotMessage(messagesDB, 'polymer')
-      else this._handleBotMessage(messagesDB, 'default')
+      if (msg.text.includes('react')) this._handleBotMessage('react')
+      else if (msg.text.includes('android')) this._handleBotMessage('android')
+      else if (msg.text.includes('angular')) this._handleBotMessage('angular')
+      else if (msg.text.includes('javascript')) this._handleBotMessage('javascript')
+      else if (msg.text.includes('polymer')) this._handleBotMessage('polymer')
+      else this._handleBotMessage('default')
     }
   }
 
@@ -121,16 +114,21 @@ class App extends Component {
     )
   }
 
-  _handleBotMessage (messagesDB, word) {
+  _handleBotMessage (word) {
+    const messagesDB = firebase.database().ref().child('messages')
+
     firebase.database().ref(`/bot/${word}`).once('value')
       .then(snap => {
         let newBotMessage = messagesDB.push()
-        newBotMessage.set({
-          text: snap.val(),
-          avatar: BOT_AVATAR,
-          displayName: BOT_NAME,
-          date: Date.now()
-        })
+
+        setTimeout(() => {
+          newBotMessage.set({
+            text: snap.val(),
+            avatar: BOT_AVATAR,
+            displayName: BOT_NAME,
+            date: Date.now()
+          })
+        }, 1200)
       })
   }
 }
