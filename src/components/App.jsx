@@ -5,12 +5,16 @@ import Header from './Header'
 import ChatInput from './ChatInput'
 import ChatMessage from './ChatMessage'
 
+const BOT_AVATAR = 'https://firebasestorage.googleapis.com/v0/b/react-firebase-chat-74da6.appspot.com/o/img%2Fpaje_real.png?alt=media&token=7c2a5fd4-09ac-4997-8c50-ae9e1de8fca7'
+const BOT_NAME = 'Paje Real'
+
 class App extends Component {
   constructor () {
     super()
     this.state = {
       messages: [],
-      user: null
+      user: null,
+      count: 0
     }
   }
 
@@ -50,22 +54,53 @@ class App extends Component {
 
   handleSendMessage (event) {
     event.preventDefault()
-    const database = firebase.database().ref().child('messages')
+    const messagesDB = firebase.database().ref().child('messages')
+    const botDB = firebase.database().ref().child('bot')
 
-    let message = database.push()
+    // Gestionamos el mensaje que envía el usuario
+    let newUserMessage = messagesDB.push()
     let msg = {
       text: event.target.text.value,
       avatar: this.state.user.photoURL,
       displayName: this.state.user.displayName,
       date: Date.now()
     }
-    message.set(msg)
+    newUserMessage.set(msg)
+
+    // El bot responde...
+    if (this.state.count < 1) {
+      // Si es el primer mensaje
+      this.setState({ count: 2 })
+
+      firebase.database().ref('/bot/bienvenida').once('value')
+        .then(snap => {
+          let newBotMessage = messagesDB.push()
+          newBotMessage.set({
+            text: snap.val(),
+            avatar: BOT_AVATAR,
+            displayName: BOT_NAME,
+            date: Date.now()
+          })
+        })
+    } else {
+      // Si es el siguiente y contiene alguna palabra "mágica"
+      msg.text = msg.text.toLowerCase()
+
+      if (msg.text.includes('react')) this._handleBotMessage(messagesDB, 'react')
+      else if (msg.text.includes('android')) this._handleBotMessage(messagesDB, 'android')
+      else if (msg.text.includes('angular')) this._handleBotMessage(messagesDB, 'angular')
+      else if (msg.text.includes('javascript')) this._handleBotMessage(messagesDB, 'javascript')
+      else if (msg.text.includes('polymer')) this._handleBotMessage(messagesDB, 'polymer')
+      else this._handleBotMessage(messagesDB, 'default')
+    }
   }
 
   renderMessages () {
-    setTimeout(() => {
-      console.log('caca')
-    }, 2000)
+    if (this.state.user) {
+      return this.state.messages.map(msg => (
+        <ChatMessage message={msg} />
+      )).reverse()
+    }
   }
 
   render () {
@@ -78,21 +113,27 @@ class App extends Component {
           onLogout={this.handleLogout.bind(this)}
         />
         <div className='message-chat-list container'>
-          <span>
-            Bienvenid@ al chat de los Reyes Magos. Antes de que
-            puedas enviarnos tu carta, te haremos unas preguntas
-            para ver que tal te has portado...
-          </span>
           <br/><br/>
-          {this.state.messages.map(msg => (
-            <ChatMessage message={msg} />
-          )).reverse()}
+          {this.renderMessages()}
         </div>
         <ChatInput
           onSendMessage={this.handleSendMessage.bind(this)}
         />
       </div>
     )
+  }
+
+  _handleBotMessage (messagesDB, word) {
+    firebase.database().ref(`/bot/${word}`).once('value')
+      .then(snap => {
+        let newBotMessage = messagesDB.push()
+        newBotMessage.set({
+          text: snap.val(),
+          avatar: BOT_AVATAR,
+          displayName: BOT_NAME,
+          date: Date.now()
+        })
+      })
   }
 }
 

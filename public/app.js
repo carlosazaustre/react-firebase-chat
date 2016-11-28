@@ -63,9 +63,7 @@
 
 	var _firebase2 = _interopRequireDefault(_firebase);
 
-	__webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./styles.css\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
-
-	var _App = __webpack_require__(186);
+	var _App = __webpack_require__(185);
 
 	var _App2 = _interopRequireDefault(_App);
 
@@ -22132,8 +22130,7 @@
 
 
 /***/ },
-/* 185 */,
-/* 186 */
+/* 185 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22152,15 +22149,15 @@
 
 	var _firebase2 = _interopRequireDefault(_firebase);
 
-	var _Header = __webpack_require__(187);
+	var _Header = __webpack_require__(186);
 
 	var _Header2 = _interopRequireDefault(_Header);
 
-	var _ChatInput = __webpack_require__(188);
+	var _ChatInput = __webpack_require__(187);
 
 	var _ChatInput2 = _interopRequireDefault(_ChatInput);
 
-	var _ChatMessage = __webpack_require__(189);
+	var _ChatMessage = __webpack_require__(188);
 
 	var _ChatMessage2 = _interopRequireDefault(_ChatMessage);
 
@@ -22172,6 +22169,9 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+	var BOT_AVATAR = 'https://firebasestorage.googleapis.com/v0/b/react-firebase-chat-74da6.appspot.com/o/img%2Fpaje_real.png?alt=media&token=7c2a5fd4-09ac-4997-8c50-ae9e1de8fca7';
+	var BOT_NAME = 'Paje Real';
+
 	var App = function (_Component) {
 	  _inherits(App, _Component);
 
@@ -22182,7 +22182,8 @@
 
 	    _this.state = {
 	      messages: [],
-	      user: null
+	      user: null,
+	      count: 0
 	    };
 	    return _this;
 	  }
@@ -22234,16 +22235,84 @@
 	    key: 'handleSendMessage',
 	    value: function handleSendMessage(event) {
 	      event.preventDefault();
-	      var database = _firebase2.default.database().ref().child('messages');
+	      var messagesDB = _firebase2.default.database().ref().child('messages');
+	      var botDB = _firebase2.default.database().ref().child('bot');
 
-	      var message = database.push();
+	      // Gestionamos el mensaje que envía el usuario
+	      var newUserMessage = messagesDB.push();
 	      var msg = {
 	        text: event.target.text.value,
 	        avatar: this.state.user.photoURL,
 	        displayName: this.state.user.displayName,
 	        date: Date.now()
 	      };
-	      message.set(msg);
+	      newUserMessage.set(msg);
+
+	      // El bot responde...
+	      if (this.state.count < 1) {
+	        // Si es el primer mensaje
+	        _firebase2.default.database().ref('/bot/bienvenida').once('value').then(function (snap) {
+	          var newBotMessage = messagesDB.push();
+	          newBotMessage.set({
+	            text: snap.val(),
+	            avatar: BOT_AVATAR,
+	            displayName: BOT_NAME,
+	            date: Date.now()
+	          });
+	        });
+	        debugger;
+	        this.setState({ count: this.state.count++ });
+	      } else {
+	        // Si es el siguiente y contiene alguna palabra "mágica"
+	        msg.text.toLowerCase();
+
+	        if (msg.text.includes('react')) {
+	          _firebase2.default.database().ref('/bot/react').once('value').then(function (snap) {
+	            var newBotMessage = messagesDB.push();
+	            newBotMessage.set({
+	              text: snap.val(),
+	              avatar: BOT_AVATAR,
+	              displayName: BOT_NAME,
+	              date: Date.now()
+	            });
+	          });
+	        }
+	      }
+
+	      /*if (this.state.count < 1) {
+	        debugger;
+	        // Si es el primer mensaje, el Bot envía el mensaje de bienvenida
+	        let msgBot = botDB.child('bienvenida')
+	        let newBotMessage = messagesDB.push()
+	        newBotMessage.set(msgBot)
+	        this.setState({ count: this.state.count++ })
+	      } else {
+	        // Si es de los siguientes, dependiendo del mensaje del usuario, se
+	        // enviará uno u otro mensaje del bot
+	        let msgJavascript = botDB.child('javascript')
+	        let msgReact = botDB.child('react')
+	        let msgAngular = botDB.child('angular')
+	        let msgPolymer = botDB.child('polymer')
+	        let msgAndroid = botDB.child('android')
+	        var msgToReturn = null
+	         msg.text = msg.text.toLowerCase()
+	         if (msg.text.includes('javascript')) msgToReturn = msgJavascript
+	        if (msg.text.includes('angular')) msgToReturn = msgAngular
+	        if (msg.text.includes('polymer')) msgToReturn = msgPolymer
+	        if (msg.text.includes('android')) msgToReturn = msgAndroid
+	        if (msg.text.includes('react')) msgToReturn = msgReact
+	         let newBotMessage = messagesDB.push()
+	        newBotMessage.set(msgToReturn)
+	      }*/
+	    }
+	  }, {
+	    key: 'renderMessages',
+	    value: function renderMessages() {
+	      if (this.state.user) {
+	        return this.state.messages.map(function (msg) {
+	          return _react2.default.createElement(_ChatMessage2.default, { message: msg });
+	        }).reverse();
+	      }
 	    }
 	  }, {
 	    key: 'render',
@@ -22258,11 +22327,11 @@
 	          onLogout: this.handleLogout.bind(this)
 	        }),
 	        _react2.default.createElement(
-	          'main',
-	          { role: 'main', className: 'container' },
-	          this.state.messages.map(function (msg) {
-	            return _react2.default.createElement(_ChatMessage2.default, { message: msg });
-	          }).reverse()
+	          'div',
+	          { className: 'message-chat-list container' },
+	          _react2.default.createElement('br', null),
+	          _react2.default.createElement('br', null),
+	          this.renderMessages()
 	        ),
 	        _react2.default.createElement(_ChatInput2.default, {
 	          onSendMessage: this.handleSendMessage.bind(this)
@@ -22277,7 +22346,7 @@
 	exports.default = App;
 
 /***/ },
-/* 187 */
+/* 186 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22301,13 +22370,13 @@
 	  function renderUserData() {
 	    return _react2.default.createElement(
 	      'ul',
-	      { className: 'right' },
+	      { className: 'navbar right' },
 	      _react2.default.createElement(
 	        'li',
 	        null,
 	        _react2.default.createElement('img', {
 	          width: '32',
-	          className: 'circle responsive-img',
+	          className: 'avatar circle responsive-img',
 	          src: user.photoURL
 	        })
 	      ),
@@ -22369,7 +22438,7 @@
 	exports.default = Header;
 
 /***/ },
-/* 188 */
+/* 187 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22390,7 +22459,6 @@
 	  return _react2.default.createElement(
 	    'form',
 	    { className: 'page-footer blue lighten-4', onSubmit: onSendMessage },
-	    _react2.default.createElement('br', null),
 	    _react2.default.createElement(
 	      'div',
 	      { className: 'container row' },
@@ -22420,7 +22488,7 @@
 	exports.default = MessageInput;
 
 /***/ },
-/* 189 */
+/* 188 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22440,29 +22508,21 @@
 
 	  return _react2.default.createElement(
 	    'div',
-	    { className: 'card-panel grey lighten-5' },
+	    { className: 'message-chat row' },
 	    _react2.default.createElement(
 	      'div',
-	      { className: 'row valign-wrapper' },
-	      _react2.default.createElement(
-	        'div',
-	        { className: 'col s2' },
-	        _react2.default.createElement('img', {
-	          width: '64px',
-	          src: message.avatar,
-	          alt: message.displayName,
-	          className: 'circle responsive-img'
-	        })
-	      ),
-	      _react2.default.createElement(
-	        'div',
-	        { className: 'col s10' },
-	        _react2.default.createElement(
-	          'span',
-	          { className: 'black-text' },
-	          message.text
-	        )
-	      )
+	      { className: 'col s2' },
+	      _react2.default.createElement('img', {
+	        width: '48px',
+	        className: 'circle',
+	        src: message.avatar,
+	        alt: message.displayName
+	      })
+	    ),
+	    _react2.default.createElement(
+	      'div',
+	      { className: 'col s10' },
+	      message.text
 	    )
 	  );
 	}
