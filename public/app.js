@@ -22236,7 +22236,6 @@
 	    value: function handleSendMessage(event) {
 	      event.preventDefault();
 	      var messagesDB = _firebase2.default.database().ref().child('messages');
-	      var botDB = _firebase2.default.database().ref().child('bot');
 
 	      // Gestionamos el mensaje que envía el usuario
 	      var newUserMessage = messagesDB.push();
@@ -22251,6 +22250,8 @@
 	      // El bot responde...
 	      if (this.state.count < 1) {
 	        // Si es el primer mensaje
+	        this.setState({ count: 2 });
+
 	        _firebase2.default.database().ref('/bot/bienvenida').once('value').then(function (snap) {
 	          var newBotMessage = messagesDB.push();
 	          newBotMessage.set({
@@ -22260,50 +22261,12 @@
 	            date: Date.now()
 	          });
 	        });
-	        debugger;
-	        this.setState({ count: this.state.count++ });
 	      } else {
 	        // Si es el siguiente y contiene alguna palabra "mágica"
-	        msg.text.toLowerCase();
+	        msg.text = msg.text.toLowerCase();
 
-	        if (msg.text.includes('react')) {
-	          _firebase2.default.database().ref('/bot/react').once('value').then(function (snap) {
-	            var newBotMessage = messagesDB.push();
-	            newBotMessage.set({
-	              text: snap.val(),
-	              avatar: BOT_AVATAR,
-	              displayName: BOT_NAME,
-	              date: Date.now()
-	            });
-	          });
-	        }
+	        if (msg.text.includes('react')) this._handleBotMessage(messagesDB, 'react');else if (msg.text.includes('android')) this._handleBotMessage(messagesDB, 'android');else if (msg.text.includes('angular')) this._handleBotMessage(messagesDB, 'angular');else if (msg.text.includes('javascript')) this._handleBotMessage(messagesDB, 'javascript');else if (msg.text.includes('polymer')) this._handleBotMessage(messagesDB, 'polymer');else this._handleBotMessage(messagesDB, 'default');
 	      }
-
-	      /*if (this.state.count < 1) {
-	        debugger;
-	        // Si es el primer mensaje, el Bot envía el mensaje de bienvenida
-	        let msgBot = botDB.child('bienvenida')
-	        let newBotMessage = messagesDB.push()
-	        newBotMessage.set(msgBot)
-	        this.setState({ count: this.state.count++ })
-	      } else {
-	        // Si es de los siguientes, dependiendo del mensaje del usuario, se
-	        // enviará uno u otro mensaje del bot
-	        let msgJavascript = botDB.child('javascript')
-	        let msgReact = botDB.child('react')
-	        let msgAngular = botDB.child('angular')
-	        let msgPolymer = botDB.child('polymer')
-	        let msgAndroid = botDB.child('android')
-	        var msgToReturn = null
-	         msg.text = msg.text.toLowerCase()
-	         if (msg.text.includes('javascript')) msgToReturn = msgJavascript
-	        if (msg.text.includes('angular')) msgToReturn = msgAngular
-	        if (msg.text.includes('polymer')) msgToReturn = msgPolymer
-	        if (msg.text.includes('android')) msgToReturn = msgAndroid
-	        if (msg.text.includes('react')) msgToReturn = msgReact
-	         let newBotMessage = messagesDB.push()
-	        newBotMessage.set(msgToReturn)
-	      }*/
 	    }
 	  }, {
 	    key: 'renderMessages',
@@ -22337,6 +22300,19 @@
 	          onSendMessage: this.handleSendMessage.bind(this)
 	        })
 	      );
+	    }
+	  }, {
+	    key: '_handleBotMessage',
+	    value: function _handleBotMessage(messagesDB, word) {
+	      _firebase2.default.database().ref('/bot/' + word).once('value').then(function (snap) {
+	        var newBotMessage = messagesDB.push();
+	        newBotMessage.set({
+	          text: snap.val(),
+	          avatar: BOT_AVATAR,
+	          displayName: BOT_NAME,
+	          date: Date.now()
+	        });
+	      });
 	    }
 	  }]);
 
@@ -22447,43 +22423,74 @@
 	  value: true
 	});
 
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 	var _react = __webpack_require__(2);
 
 	var _react2 = _interopRequireDefault(_react);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	function MessageInput(_ref) {
-	  var onSendMessage = _ref.onSendMessage;
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	  return _react2.default.createElement(
-	    'form',
-	    { className: 'page-footer blue lighten-4', onSubmit: onSendMessage },
-	    _react2.default.createElement(
-	      'div',
-	      { className: 'container row' },
-	      _react2.default.createElement(
-	        'div',
-	        { className: 'col s9' },
-	        _react2.default.createElement('input', { name: 'text', type: 'text' })
-	      ),
-	      _react2.default.createElement(
-	        'div',
-	        { className: 'col s3' },
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var MessageInput = function (_Component) {
+	  _inherits(MessageInput, _Component);
+
+	  function MessageInput(props) {
+	    _classCallCheck(this, MessageInput);
+
+	    var _this = _possibleConstructorReturn(this, (MessageInput.__proto__ || Object.getPrototypeOf(MessageInput)).call(this, props));
+
+	    _this.state = {
+	      text: ''
+	    };
+	    return _this;
+	  }
+
+	  _createClass(MessageInput, [{
+	    key: 'handleSubmit',
+	    value: function handleSubmit() {
+	      return this.props.onSendMessage();
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'form',
+	        { className: 'page-footer blue lighten-4', onSubmit: this.handleSubmit() },
 	        _react2.default.createElement(
-	          'button',
-	          { className: 'btn waves-effect waves-light blue darken-1', type: 'submit' },
-	          'Enviar',
+	          'div',
+	          { className: 'container row' },
 	          _react2.default.createElement(
-	            'i',
-	            { className: 'material-icons right' },
-	            'send'
+	            'div',
+	            { className: 'col s9' },
+	            _react2.default.createElement('input', { name: 'text', type: 'text', value: this.state.text })
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'col s3' },
+	            _react2.default.createElement(
+	              'button',
+	              { className: 'btn waves-effect waves-light blue darken-1', type: 'submit' },
+	              'Enviar',
+	              _react2.default.createElement(
+	                'i',
+	                { className: 'material-icons right' },
+	                'send'
+	              )
+	            )
 	          )
 	        )
-	      )
-	    )
-	  );
-	}
+	      );
+	    }
+	  }]);
+
+	  return MessageInput;
+	}(_react.Component);
 
 	exports.default = MessageInput;
 

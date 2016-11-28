@@ -1,8 +1,14 @@
-import React from 'react'
+import React, { Component } from 'react'
 
-function MessageInput ({ onSendMessage }) {
+function ChatInput ({ onSendMessage }) {
+  function handleSubmit (e) {
+    e.preventDefault()
+    onSendMessage(e.target.text.value)
+    e.target.text.value = ''
+  }
+
   return (
-    <form className='page-footer blue lighten-4' onSubmit={onSendMessage}>
+    <form className='page-footer blue lighten-4' onSubmit={handleSubmit}>
       <div className='container row'>
         <div className='col s9'>
           <input name='text' type='text' />
@@ -18,4 +24,4 @@ function MessageInput ({ onSendMessage }) {
   )
 }
 
-export default MessageInput
+export default ChatInput

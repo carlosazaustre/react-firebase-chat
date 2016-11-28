@@ -52,15 +52,13 @@ class App extends Component {
       .catch(error => console.log(`Error ${error.code}: ${error.message}`))
   }
 
-  handleSendMessage (event) {
-    event.preventDefault()
+  handleSendMessage (text) {
     const messagesDB = firebase.database().ref().child('messages')
-    const botDB = firebase.database().ref().child('bot')
 
     // Gestionamos el mensaje que envía el usuario
     let newUserMessage = messagesDB.push()
     let msg = {
-      text: event.target.text.value,
+      text,
       avatar: this.state.user.photoURL,
       displayName: this.state.user.displayName,
       date: Date.now()
