@@ -67,11 +67,9 @@ class App extends Component {
     newUserMessage.set(msg)
 
     // El bot responde...
-    console.log('Antes del if ' + this.state.count)
     if (this.state.count < 1) {
       // Si es el primer mensaje
       this.setState({ count: this.state.count + 1 })
-      console.log('Depues del if ' + this.state.count)
       this._handleBotMessage('bienvenida')
     } else {
       // Si es el siguiente y contiene alguna palabra "mágica"
