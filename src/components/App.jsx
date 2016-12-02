@@ -21,8 +21,6 @@ class App extends Component {
   componentWillMount () {
     const messagesDB = firebase.database().ref().child('messages')
 
-    messagesDB.remove()
-
     messagesDB.on('child_added', snap => {
       this.setState({
         messages: this.state.messages.concat(snap.val())
@@ -30,11 +28,7 @@ class App extends Component {
     })
 
     firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        this.setState({ user })
-      } else {
-        this.setState({ user: null })
-      }
+      this.setState({ user })
     })
   }
 
