@@ -6,8 +6,7 @@ firebase.initializeApp({
   apiKey: 'AIzaSyBTKeSmJ-EZT8gFtdQxTdvcw3kDv1xK4pc',
   authDomain: 'react-firebase-chat-74da6.firebaseapp.com',
   databaseURL: 'https://react-firebase-chat-74da6.firebaseio.com',
-  storageBucket: 'react-firebase-chat-74da6.appspot.com',
-  messagingSenderId: '1005738784121'
+  storageBucket: 'react-firebase-chat-74da6.appspot.com'
 })
 
 import App from './components/App'

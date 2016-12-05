@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PropTypes } from 'react'
 
 function ChatMessage ({ message }) {
   return (
@@ -16,6 +16,10 @@ function ChatMessage ({ message }) {
       </div>
     </div>
   )
+}
+
+ChatMessage.propTypes = {
+  message: PropTypes.object.isRequired
 }
 
 export default ChatMessage

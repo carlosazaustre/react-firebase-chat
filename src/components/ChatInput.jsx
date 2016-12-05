@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PropTypes } from 'react'
 
 function ChatInput ({ onSendMessage }) {
   function handleSubmit (e) {
@@ -22,6 +22,10 @@ function ChatInput ({ onSendMessage }) {
       </div>
     </form>
   )
+}
+
+ChatInput.propTypes = {
+  onSendMessage: PropTypes.func.isRequired
 }
 
 export default ChatInput

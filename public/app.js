@@ -70,11 +70,10 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	_firebase2.default.initializeApp({
-	  apiKey: 'AIzaSyBTKeSmJ-EZT8gFtdQxTdvcw3kDv1xK4pc',
-	  authDomain: 'react-firebase-chat-74da6.firebaseapp.com',
-	  databaseURL: 'https://react-firebase-chat-74da6.firebaseio.com',
-	  storageBucket: 'react-firebase-chat-74da6.appspot.com',
-	  messagingSenderId: '1005738784121'
+	  apiKey: "AIzaSyC0qJej2AxbWXvNdPSys9W3VPc9aNybONI",
+	  authDomain: "react-firebase-94af6.firebaseapp.com",
+	  databaseURL: "https://react-firebase-94af6.firebaseio.com",
+	  storageBucket: "react-firebase-94af6.appspot.com"
 	});
 
 	(0, _reactDom.render)(_react2.default.createElement(_App2.default, null), document.getElementById('app'));
@@ -22157,9 +22156,9 @@
 
 	var _ChatInput2 = _interopRequireDefault(_ChatInput);
 
-	var _ChatMessage = __webpack_require__(188);
+	var _ChatMessageList = __webpack_require__(188);
 
-	var _ChatMessage2 = _interopRequireDefault(_ChatMessage);
+	var _ChatMessageList2 = _interopRequireDefault(_ChatMessageList);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -22180,11 +22179,7 @@
 
 	    var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this));
 
-	    _this.state = {
-	      messages: [],
-	      user: null,
-	      count: 0
-	    };
+	    _this.handleSendMessage.bind(_this);
 	    return _this;
 	  }
 
@@ -22193,22 +22188,8 @@
 	    value: function componentWillMount() {
 	      var _this2 = this;
 
-	      var messagesDB = _firebase2.default.database().ref().child('messages');
-
-	      messagesDB.remove();
-
-	      messagesDB.on('child_added', function (snap) {
-	        _this2.setState({
-	          messages: _this2.state.messages.concat(snap.val())
-	        });
-	      });
-
 	      _firebase2.default.auth().onAuthStateChanged(function (user) {
-	        if (user) {
-	          _this2.setState({ user: user });
-	        } else {
-	          _this2.setState({ user: null });
-	        }
+	        _this2.setState({ user: user });
 	      });
 	    }
 	  }, {
@@ -22260,15 +22241,6 @@
 	      }
 	    }
 	  }, {
-	    key: 'renderMessages',
-	    value: function renderMessages() {
-	      if (this.state.user) {
-	        return this.state.messages.map(function (msg) {
-	          return _react2.default.createElement(_ChatMessage2.default, { message: msg });
-	        }).reverse();
-	      }
-	    }
-	  }, {
 	    key: 'render',
 	    value: function render() {
 	      return _react2.default.createElement(
@@ -22284,11 +22256,10 @@
 	          'div',
 	          { className: 'message-chat-list container' },
 	          _react2.default.createElement('br', null),
-	          _react2.default.createElement('br', null),
-	          this.renderMessages()
+	          _react2.default.createElement(_ChatMessageList2.default, { user: this.state.user })
 	        ),
 	        _react2.default.createElement(_ChatInput2.default, {
-	          onSendMessage: this.handleSendMessage.bind(this)
+	          onSendMessage: this.handleSendMessage
 	        })
 	      );
 	    }
@@ -22467,6 +22438,83 @@
 
 /***/ },
 /* 188 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _ChatMessage = __webpack_require__(189);
+
+	var _ChatMessage2 = _interopRequireDefault(_ChatMessage);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var ChatMessageList = function (_Component) {
+	  _inherits(ChatMessageList, _Component);
+
+	  function ChatMessageList() {
+	    var _ref;
+
+	    var _temp, _this, _ret;
+
+	    _classCallCheck(this, ChatMessageList);
+
+	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	      args[_key] = arguments[_key];
+	    }
+
+	    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = ChatMessageList.__proto__ || Object.getPrototypeOf(ChatMessageList)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
+	      messages: [],
+	      count: 0
+	    }, _temp), _possibleConstructorReturn(_this, _ret);
+	  }
+
+	  _createClass(ChatMessageList, [{
+	    key: 'render',
+	    value: function render() {
+	      if (this.props.user) {
+	        return _react2.default.createElement(
+	          'div',
+	          null,
+	          this.state.messages.map(function (msg) {
+	            return _react2.default.createElement(_ChatMessage2.default, { message: msg });
+	          }).reverse()
+	        );
+	      } else {
+	        return _react2.default.createElement(
+	          'div',
+	          null,
+	          'Debes estar autenticado para poder leer y enviar mensajes'
+	        );
+	      }
+	    }
+	  }]);
+
+	  return ChatMessageList;
+	}(_react.Component);
+
+	ChatMessageList.propTypes = {
+	  user: _react.PropTypes.object
+	};
+	exports.default = ChatMessageList;
+
+/***/ },
+/* 189 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
